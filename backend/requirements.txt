@@ -1,0 +1,9 @@
+fastapi          # Framework do tworzenia API
+uvicorn          # Serwer ASGI do uruchamiania FastAPI
+influxdb-client  # Biblioteka do komunikacji z InfluxDB
+pandas           # Przetwarzanie i analiza danych
+python-dotenv    # Zarządzanie zmiennymi środowiskowymi (np. token InfluxDB)
+pydantic         # Walidacja danych w FastAPI
+aiohttp          # Biblioteka do asynchronicznego wykonywania zapytań HTTP
+schedule         # Biblioteka do planowania zadań
+tqdm             # Pasek postępu
