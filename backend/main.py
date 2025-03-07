@@ -1,4 +1,5 @@
 # file : /backend/main.py
+import logging
 
 import uvicorn
 from fastapi import FastAPI, Query
@@ -8,7 +9,6 @@ from backend.scheduler import run_schedule
 from backend.gios_api import fetch_and_save
 from backend.models import AirQualityData
 from backend.database import get_air_quality, get_stations, get_time_range
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) :
