@@ -1,3 +1,5 @@
+# file: backend/gios_api.py
+
 import aiohttp
 import asyncio
 from typing import List, Dict, Any
@@ -98,8 +100,6 @@ async def fetch_gios_data() -> List[Dict[str, Any]]:
         for result in sensor_data:
             if isinstance(result, list):
                 data.extend(result)
-
-        logging.info(f"Fetched {len(data)} data points from GIOŚ API")
         return data
 
 
@@ -115,5 +115,4 @@ async def fetch_and_save() -> None:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
     asyncio.run(fetch_and_save())

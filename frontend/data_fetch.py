@@ -5,29 +5,29 @@ import logging
 
 FASTAPI_URL = "http://localhost:8000"
 
-async def fetch_influx_stations():
-    """Fetch unique station IDs from FastAPI asynchronously."""
-    url = f"{FASTAPI_URL}/stations"
+async def fetch_any(url_suffix, error_msg = "Error fetching data", return_none_on_error=False):
+    """Fetch data from FastAPI asynchronously."""
+    url = f"{FASTAPI_URL}/{url_suffix}"
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 response.raise_for_status()
                 return await response.json()
     except aiohttp.ClientError as e:
-        logging.error(f"Error fetching stations: {e}")
-        return []
+        logging.error(f"{error_msg}: {e}")
+        return None if return_none_on_error else []
+
+async def fetch_influx_stations():
+    """Fetch unique station IDs from FastAPI asynchronously."""
+    return await fetch_any("stations")
+
+async def fetch_user_stations():
+    """Fetch metadata for user stations from FastAPI asynchronously."""
+    return await fetch_any("user_stations", "Error fetching user stations")
 
 async def fetch_time_range():
     """Fetch the earliest and latest available timestamp from FastAPI asynchronously."""
-    url = f"{FASTAPI_URL}/time_range"
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
-                response.raise_for_status()
-                return await response.json()
-    except aiohttp.ClientError as e:
-        logging.error(f"Error fetching time range: {e}")
-        return None
+    return await fetch_any("time_range", "Error fetching time range", return_none_on_error=True)
 
 async def fetch_air_quality(station_ids=None, start_date=None, end_date=None, aggregation="1h"):
     """Fetch air quality data asynchronously from FastAPI with aggregation."""
@@ -40,16 +40,4 @@ async def fetch_air_quality(station_ids=None, start_date=None, end_date=None, ag
         f"aggregation={aggregation}" if aggregation else None
     ])
 
-    url = f"{FASTAPI_URL}/air_quality?{'&'.join(params)}"
-
-    async with aiohttp.ClientSession() as session:
-        try:
-            async with session.get(url) as response:
-                response.raise_for_status()
-                return await response.json()
-        except aiohttp.ClientResponseError as e:
-            logging.error(f"[ERROR] HTTP {response.status}: {await response.text()}")
-        except aiohttp.ClientError as e:
-            logging.error(f"[ERROR] Network request failed: {e}")
-
-    return []
+    return await fetch_any(f"air_quality?{'&'.join(params)}", "Error fetching air quality data")

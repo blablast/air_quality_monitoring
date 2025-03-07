@@ -12,7 +12,6 @@ def run_schedule() -> None :
     def job() :
         try :
             asyncio.run(fetch_and_save())
-            logging.info("Scheduled data fetch completed")
         except Exception as e :
             logging.error(f"Scheduled job failed: {e}")
 

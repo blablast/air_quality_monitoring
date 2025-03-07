@@ -10,7 +10,7 @@ import pandas as pd
 import streamlit as st
 
 from frontend.gios_api import fetch_gios_stations
-from frontend.data_fetch import fetch_air_quality, fetch_influx_stations, fetch_time_range
+from frontend.data_fetch import fetch_air_quality, fetch_influx_stations, fetch_time_range, fetch_user_stations
 from frontend.utils import format_station_data, get_station_names_and_dict, process_air_quality_data
 from frontend.ui_elements import display_map, display_charts
 
@@ -19,11 +19,12 @@ st.title("Monitor jakości powietrza")
 # Fetch station data
 gios_stations = fetch_gios_stations()
 influx_station_ids = asyncio.run(fetch_influx_stations())
+user_stations = asyncio.run(fetch_user_stations())
 
 timestamp_range = asyncio.run(fetch_time_range())
 
 # Format station data
-available_stations = format_station_data(gios_stations, influx_station_ids)
+available_stations = format_station_data(gios_stations, influx_station_ids, user_stations)
 
 # Get station names and mapping
 station_names, station_dict = get_station_names_and_dict(available_stations)
