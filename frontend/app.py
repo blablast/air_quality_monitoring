@@ -9,6 +9,9 @@ import asyncio
 import pandas as pd
 import streamlit as st
 
+st.set_page_config(page_title="Monitor jakości powietrza", page_icon="🌍", layout="wide")
+pd.options.display.float_format = "{:.2f}".format
+
 from frontend.gios_api import fetch_gios_stations
 from frontend.data_fetch import fetch_air_quality, fetch_influx_stations, fetch_time_range, fetch_user_stations
 from frontend.utils import format_station_data, get_station_names_and_dict, process_air_quality_data
@@ -104,16 +107,16 @@ if air_quality_data :
 # About the author
 st.markdown("---")
 st.subheader("About the Author")
-col1, col2 = st.columns([1, 3])
-with col1:
-    st.image(
-        "https://media.licdn.com/dms/image/v2/D4E03AQE7JnBb64dkPA/profile-displayphoto-shrink_200_200/B4EZVtsmKAHUAY-/0/1741302162624?e=1746662400&v=beta&t=BFSbvrgNMpQ0bvhhxjm1mu-6Iot6zdZ1u_7HTS1hrco")
-with col2:
-    st.markdown("""
-        **Blazej Strus**  
-        Data Scientist | Machine Learning Enthusiast  
-        Experienced in developing machine learning models and implementing NLP solutions.
-    
-        📫 [b.strus@gmail.com](mailto:b.strus@gmail.com)   
-        🌐 [LinkedIn](https://www.linkedin.com/in/b%C5%82a%C5%BCej-strus-7716192a/)
-    """)
+# col1, col2 = st.columns([1, 3])
+# with col1:
+#     st.image(
+#         "https://media.licdn.com/dms/image/v2/D4E03AQE7JnBb64dkPA/profile-displayphoto-shrink_200_200/B4EZVtsmKAHUAY-/0/1741302162624?e=1746662400&v=beta&t=BFSbvrgNMpQ0bvhhxjm1mu-6Iot6zdZ1u_7HTS1hrco")
+# with col2:
+#     st.markdown("""
+#         **Blazej Strus**
+#         Data Scientist | Machine Learning Enthusiast
+#         Experienced in developing machine learning models and implementing NLP solutions.
+#
+#         📫 [b.strus@gmail.com](mailto:b.strus@gmail.com)
+#         🌐 [LinkedIn](https://www.linkedin.com/in/b%C5%82a%C5%BCej-strus-7716192a/)
+#     """)
