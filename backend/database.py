@@ -1,5 +1,5 @@
 # file: backend/database.py
-import json
+
 import os
 import logging
 from fastapi import HTTPException
