@@ -3,6 +3,7 @@
 import logging
 import uvicorn
 from fastapi import FastAPI, Query, HTTPException
+from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 from typing import List, Optional, Dict, Any
 
@@ -75,6 +76,10 @@ async def add_user_data(data: UserAirQualityData):
 async def user_stations():
     """Fetch metadata for all user stations."""
     return await get_user_stations()
+
+@app.get("/favicon.ico")
+async def favicon():
+    return FileResponse("static/favicon.ico")
 
 if __name__ == "__main__" :
     uvicorn.run(app, host = "0.0.0.0", port = 8000, log_level="info")
