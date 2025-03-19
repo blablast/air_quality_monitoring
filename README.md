@@ -185,3 +185,9 @@ INFLUXDB_BUCKET=DZB
 - ```gios_api.py``` – funkcje pobierania danych z API GIOŚ.
 - ```ui_elements.py``` – komponenty UI, np. mapa, wykresy, filtry.
 - ```utils.py``` – funkcje pomocnicze (np. formatowanie danych).
+
+##### Instalacja zależności
+```bash
+pip install -r frontend/requirements.txt
+pip install -r backend/requirements.txt
+```
