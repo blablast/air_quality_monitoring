@@ -15,6 +15,8 @@ INFLUXDB_TOKEN = os.getenv("INFLUXDB_TOKEN")
 INFLUXDB_ORG = os.getenv("INFLUXDB_ORG")
 INFLUXDB_BUCKET = os.getenv("INFLUXDB_BUCKET")
 
+export_file = "exported_data.line"
+
 # Validate environment variables
 if not all([INFLUXDB_URL, INFLUXDB_TOKEN, INFLUXDB_ORG, INFLUXDB_BUCKET]) :
     raise ValueError("Missing required InfluxDB environment variables")
@@ -187,3 +189,34 @@ def get_time_range(source: str | None = None) -> tuple[str, str] | None:
     except Exception as e :
         logging.error(f"Error fetching time range failed: {e}")
         return None
+
+def export_to_file():
+    query = f'''
+    from(bucket: "{INFLUXDB_BUCKET}")
+      |> range(start: 0)
+      |> filter(fn: (r) => r._measurement == "air_quality")
+    '''
+    result = query_api.query(query=query)
+
+    # Save data to Line Protocol file
+    with open(export_file, "w") as f:
+        for table in result:
+            for record in table.records:
+                # Create Line Protocol string
+                measurement = record["_measurement"]
+                tags = ",".join([f"{k}={v}" for k, v in record.values.items() if k not in ["_time", "_value", "_field", "_measurement"]])
+                if tags:
+                    tags = "," + tags
+                field = f"{record['_field']}={record['_value']}"
+                timestamp = int(record["_time"].timestamp() * 1_000_000_000)  # Convert to nanoseconds
+                line = f"{measurement}{tags} {field} {timestamp}"
+                f.write(line + "\n")
+
+    print(f"Wyeksportowano dane do pliku: {export_file}")
+
+def import_from_file():
+    with open(export_file, "r") as f:
+        lines = f.readlines()
+        write_api.write(bucket=INFLUXDB_BUCKET, record=lines)
+
+    print(f"Zaimportowano dane do bucketa: {INFLUXDB_BUCKET}")
