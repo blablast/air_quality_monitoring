@@ -190,25 +190,34 @@ def get_time_range(source: str | None = None) -> tuple[str, str] | None:
         logging.error(f"Error fetching time range failed: {e}")
         return None
 
-def export_to_file():
+
+def export_to_file() :
     query = f'''
     from(bucket: "{INFLUXDB_BUCKET}")
       |> range(start: 0)
       |> filter(fn: (r) => r._measurement == "air_quality")
     '''
-    result = query_api.query(query=query)
+    result = query_api.query(query = query)
 
     # Save data to Line Protocol file
-    with open(export_file, "w") as f:
-        for table in result:
-            for record in table.records:
-                # Create Line Protocol string
+    with open(export_file, "w") as f :
+        for table in result :
+            for record in table.records :
+                # Define the measurement
                 measurement = record["_measurement"]
-                tags = ",".join([f"{k}={v}" for k, v in record.values.items() if k not in ["_time", "_value", "_field", "_measurement"]])
-                if tags:
+
+                # Only include relevant tags (station_id and source)
+                tags = ",".join(f"{k}={v}" for k, v in record.values.items() if k in ["station_id", "source"])
+                if tags :
                     tags = "," + tags
+
+                # Define the field
                 field = f"{record['_field']}={record['_value']}"
-                timestamp = int(record["_time"].timestamp() * 1_000_000_000)  # Convert to nanoseconds
+
+                # Convert timestamp to nanoseconds
+                timestamp = int(record["_time"].timestamp() * 1_000_000_000)
+
+                # Construct the Line Protocol line
                 line = f"{measurement}{tags} {field} {timestamp}"
                 f.write(line + "\n")
 
