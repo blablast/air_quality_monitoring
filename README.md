@@ -188,6 +188,16 @@ INFLUXDB_BUCKET=DZB
 
 ##### Instalacja zależności
 ```bash
-pip install -r frontend/requirements.txt
-pip install -r backend/requirements.txt
+  pip install -r frontend/requirements.txt
+```
+```bash
+  pip install -r backend/requirements.txt
+```
+
+#### Uruchomienie
+```bash
+  uvicorn backend.main:app --reload --port 8000
+```
+```bash
+  streamlit run frontend/app.py
 ```
