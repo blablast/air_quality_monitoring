@@ -23,7 +23,8 @@ if not all([INFLUXDB_URL, INFLUXDB_TOKEN, INFLUXDB_ORG, INFLUXDB_BUCKET]) :
 
 client = InfluxDBClient(url = INFLUXDB_URL, token = INFLUXDB_TOKEN, org = INFLUXDB_ORG)
 query_api = client.query_api()
-write_api = client.write_api()
+#write_api = client.write_api()
+write_api = client.write_api(write_options=WriteOptions(batch_size=500, flush_interval=10_000, jitter_interval=2_000))
 
 def save_to_influxdb(data: List[Dict[str, Any]]) -> None:
     """Save air quality data to InfluxDB with source tag asynchronously."""
@@ -245,10 +246,21 @@ def import_from_file(clear_db: bool = False) -> None:
     if clear_db:
         clear_database()
 
-    # Check if the export file exists
-    with open(export_file, "r") as f:
-        # Read the file line by line and write to InfluxDB
-        lines = f.readlines()
-        write_api.write(bucket=INFLUXDB_BUCKET, record=lines)
+    try:
+        with open(export_file, "r") as f:
+            lines = f.readlines()
+            # Write data synchronously or ensure completion
+            write_api.write(bucket=INFLUXDB_BUCKET, record=lines)
 
-    print(f"Zaimportowano dane do bucketa: {INFLUXDB_BUCKET}")
+        # Flush any remaining batched data
+        write_api.flush()
+
+        print(f"Zaimportowano dane do bucketa: {INFLUXDB_BUCKET}")
+
+    except Exception as e:
+        logging.error(f"Error during import: {e}")
+        raise
+    finally:
+        # Ensure resources are cleaned up
+        write_api.close()
+        client.close()
