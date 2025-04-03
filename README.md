@@ -1,6 +1,18 @@
 # System monitorowania jakości powietrza z wykorzystaniem przetwarzania i analizy dużych zbiorów danych
 
-## 1. Cel i zakres opracowania
+## Spis Treści
+- [Opis Projektu](#opis-projektu)
+- [Architektura Systemu](#architektura-systemu)
+- [Technologie](#technologie)
+- [Wymagania Wstępne](#wymagania-wstępne)
+- [Instalacja i Uruchomienie](#instalacja-i-uruchomienie)
+  - [1. Klonowanie Repozytorium](#1-klonowanie-repozytorium)
+  - [2. Instalacja i Konfiguracja InfluxDB](#2-instalacja-i-konfiguracja-influxdb)
+  - [3. Konfiguracja Środowiska Python](#3-konfiguracja-środowiska-python)
+  - [4. Uruchomienie Backend'u (FastAPI)](#4-uruchomienie-backendu-fastapi)
+  - [5. Uruchomienie Frontend'u (Streamlit)](#5-uruchomienie-frontendu-streamlit)
+
+## Opis Projektu
 
 ### Cel
 Celem projektu było zaprojektowanie i wdrożenie zaawansowanego systemu monitorowania jakości powietrza, który integruje, przetwarza i analizuje duże zbiory danych (Big Data) pochodzące z publicznych źródeł (GIOŚ – Główny Inspektorat Ochrony Środowiska) oraz od użytkowników indywidualnych. System miał zapewnić:
@@ -22,14 +34,15 @@ Zakres opracowania obejmował pełny cykl życia danych w systemie Big Data:
 - **frontend** - interfejs Streamlit z mapą stacji i wykresami zanieczyszczeń,
 - **przetwarzanie** - mechanizmy filtrowania, agregacji i geolokalizacji danych.
 
-## 2. Charakterystyka struktury funkcjonalno-informacyjnej opracowania
+## Architektura Systemu
 
 System jest modularny, oparty na architekturze klient-serwer z wyraźnym podziałem na **backend (FastAPI), frontend (Streamlit) i bazę danych (InfluxDB)**. Poniżej szczegółowo opisano funkcje i aspekty informacyjne, z przykładami kodu i propozycjami wizualizacji.
+
 ### 2.1. Gromadzenie danych
 
 #### Źródła danych:
-- **GIOŚ** - dane pobierane cyklicznie z API GIOŚ za pomocą gios_api.py, obejmujące pomiary zanieczyszczeń (PM2.5, PM10, NO2, SO2, O3, CO, C6H6) dla setek stacji w Polsce; funkcja `fetch_and_save()` w `backend/gios_api.py` odpowiada za ich zapis do InfluxDB.
-- **Dane użytkownika** - przyjmowane przez endpoint `/addUserData `w formacie JSON, z polami takimi jak `station_id`, `timestamp`, wartości pomiarowe oraz `lat` i `lon` dla geolokalizacji.
+- **GIOŚ** - dane pobierane cyklicznie z API GIOŚ za pomocą `gios_api.py`, obejmujące pomiary zanieczyszczeń (PM2.5, PM10, NO2, SO2, O3, CO, C6H6) dla setek stacji w Polsce; funkcja `fetch_and_save()` w `backend/gios_api.py` odpowiada za ich zapis do InfluxDB.
+- **Dane użytkownika** - przyjmowane przez endpoint `/addUserData` w formacie JSON, z polami takimi jak `station_id`, `timestamp`, wartości pomiarowe oraz `lat` i `lon` dla geolokalizacji.
 
 #### Mechanizm zapisu
 - Synchroniczny zapis do InfluxDB z użyciem `write_api`, zapewniający niezawodność i prostotę implementacji.
@@ -56,6 +69,7 @@ System realizuje gromadzenie danych poprzez automatyczne pobieranie z API GIOŚ 
 Dane są wzbogacone o kontekst przestrzenny (współrzędne) i czasowy.
 
 ![img.png](img.png)
+
 ### 2.2. Przetwarzanie danych
 
 #### Integracja źródeł
@@ -131,7 +145,7 @@ System monitorowania jakości powietrza jest w pełni funkcjonalnym rozwiązanie
 - **Streamlit**: prosty, ale potężny framework do wizualizacji danych,
 - **FastAPI**: wydajne API RESTful, które może być łatwo udokumentowane i zintegrowane z innymi systemami.
 
-## 4. Literatura – wykorzystane źródła
+## Literatura – wykorzystane źródła
 
 - [InfluxDB Documentation](https://docs.influxdata.com/influxdb/v2/)
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)
@@ -139,7 +153,7 @@ System monitorowania jakości powietrza jest w pełni funkcjonalnym rozwiązanie
 - [API GIOŚ](https://powietrze.gios.gov.pl/pjp/content/api)
 - [Plotly Documentation](https://plotly.com/python/)
 
-## 5. Podsumowanie w kontekście Big Data
+## Podsumowanie w kontekście Big Data
 
 - **volume**: obsługa tysięcy rekordów z GIOŚ i użytkownika,
 - **velocity**: szybki zapis i odczyt dzięki InfluxDB,
@@ -147,14 +161,55 @@ System monitorowania jakości powietrza jest w pełni funkcjonalnym rozwiązanie
 - **veracity**: precyzyjne przetwarzanie geolokalizacji i agregacji,
 - **value**: dostarcza actionable insights poprzez wizualizacje i API.
 
+## Architektura Systemu
 
-## 6. Instalacja
+System składa się z:
 
-#### Pobranie obrazu i zainstalowanie bazy danych w Dockerze
-```bath
-docker run -d -p 8086:8086 --name influxdb influxdb:latest
+- **Backend**: FastAPI
+- **Baza Danych**: InfluxDB
+- **Frontend**: Streamlit
+
+## Technologie
+
+- Python 3.8+
+- FastAPI
+- InfluxDB 2.x
+- Streamlit
+- Uvicorn
+
+## Wymagania Wstępne
+
+- Python 3.8+
+- Git
+- Docker (opcjonalnie)
+
+## Instalacja i Uruchomienie
+
+### 1. Klonowanie Repozytorium
+
+```bash
+  git clone https://github.com/blablast/air_quality_monitoring.git
+  cd air_quality_monitoring
 ```
-#### Konfiguracja
+
+### 2. Instalacja i Konfiguracja InfluxDB
+
+**Lokalnie:**
+
+Pobierz z [InfluxDB Downloads](https://portal.influxdata.com/downloads/) i uruchom:
+
+```bash
+  influxd
+```
+
+**Docker:**
+
+```bash
+  docker run -d --name=influxdb -p 8086:8086 influxdb:latest
+```
+
+Skonfiguruj przez `http://localhost:8086`.
+
 ```
 http://localhost:8086/onboarding/0
 username: admin
@@ -162,6 +217,7 @@ password: InfluxDB
 initial organization: AHE
 initial bucket: DZB
 ```
+
 #### Ustawienia środowiskowe (```.env```)
 ```
 INFLUXDB_URL=http://localhost:8086
@@ -170,34 +226,25 @@ INFLUXDB_ORG=AHE
 INFLUXDB_BUCKET=DZB
 ```
 
-#### Struktura projektu
-##### Podział backendu (FastAPI)
-- ```main.py``` – główny plik FastAPI, importujący funkcje z innych modułów.
-- ```database.py``` – konfiguracja InfluxDB (połączenie, zapis, odczyt).
-- ```gios_api.py``` – funkcje pobierania danych z API GIOŚ.
-- ```models.py``` – definicje modeli Pydantic dla walidacji danych.
-- ```scheduler.py``` – obsługa harmonogramu pobierania danych (z schedule).
-- ```utils.py``` – dodatkowe funkcje pomocnicze.
 
-##### Podział frontendu (Streamlit)
-- ```app.py``` – główny plik uruchamiający aplikację Streamlit.
-- ```data_fetch.py``` – pobieranie danych z FastAPI.
-- ```gios_api.py``` – funkcje pobierania danych z API GIOŚ.
-- ```ui_elements.py``` – komponenty UI, np. mapa, wykresy, filtry.
-- ```utils.py``` – funkcje pomocnicze (np. formatowanie danych).
+### 3. Konfiguracja Środowiska Python
 
-##### Instalacja zależności
 ```bash
-  pip install -r frontend/requirements.txt
-```
-```bash
-  pip install -r backend/requirements.txt
+  python3 -m venv venv
+  source venv/bin/activate
+  pip install -r requirements.txt
 ```
 
-#### Uruchomienie
+### 4. Uruchomienie Backend'u (FastAPI)
+
 ```bash
-  uvicorn backend.main:app --reload --port 8000
+  uvicorn  backend.main:app --host 0.0.0.0 --port 8000 --reload
 ```
+
+### 5. Uruchomienie Frontend'u (Streamlit)
+
 ```bash
   streamlit run frontend/app.py
 ```
+
+Frontend będzie dostępny na `http://localhost:8501`.

@@ -214,8 +214,31 @@ def export_to_file():
 
     print(f"Wyeksportowano dane do pliku: {export_file}")
 
-def import_from_file():
+
+def clear_database(measurement: str = "air_quality") -> None :
+    """Clear all data for a specific measurement from the InfluxDB bucket."""
+    try :
+        delete_api = client.delete_api()
+        start = "1970-01-01T00:00:00Z"  # Start of Unix epoch
+        stop = datetime.utcnow().isoformat() + "Z"  # Current time in UTC with Z suffix
+
+        # Delete all data for the specified measurement
+        predicate = f'_measurement="{measurement}"'
+        delete_api.delete(start = start, stop = stop, predicate = predicate, bucket = INFLUXDB_BUCKET,
+            org = INFLUXDB_ORG)
+        logging.info(f"Successfully cleared data for measurement '{measurement}' from bucket '{INFLUXDB_BUCKET}'")
+    except Exception as e :
+        logging.error(f"Error clearing database: {e}")
+        raise
+
+def import_from_file(clear_db: bool = False) -> None:
+    """Import data from a Line Protocol file into InfluxDB."""
+    if clear_db:
+        clear_database()
+
+    # Check if the export file exists
     with open(export_file, "r") as f:
+        # Read the file line by line and write to InfluxDB
         lines = f.readlines()
         write_api.write(bucket=INFLUXDB_BUCKET, record=lines)
 
